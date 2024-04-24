@@ -1,0 +1,85 @@
+body {
+    margin: 0;
+    display: flex;
+    place-items: center;
+    min-width: 720px;
+    min-height: 100vh;
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        color: #213547;
+        background-color: #ffffff;
+    }
+    a:hover {
+        color: #747bff;
+    }
+}
+
+#root {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
+}
+
+.days {
+    display: flex;
+    margin-top: 50px;
+    .day {
+        width: 70px;
+        text-align: center;
+        border-right: 1px solid #9b9b9b;
+        position: relative;
+        .header.notshown {
+            background: none;
+            border-top: none;
+            border-left: none;
+        }
+        > div {
+            height: 40px;
+            padding: 10px 5px;
+            border-bottom: 1px solid #9b9b9b;
+        }
+        .true {
+            width: 20px;
+            height: 20px;
+            border-radius: 20px;
+            background: rgb(21, 240, 13);
+            display: inline-block;
+        }
+        &.axis {
+            > div {
+                border-left: 1px solid #9b9b9b;
+            }
+        }
+    }
+    .header {
+        height: 46px;
+        background: #c1c1c1;
+        border-top: 1px solid #9b9b9b;
+    }
+}
+
+form {
+    &.form-daily {
+        margin-top: 100px;
+        width: 800px;
+    }
+    &.form-profile {
+    }
+}
+
+.profile {
+    position: absolute;
+    display: flex;
+    top: 20px;
+    right: 20px;
+    margin: 0 auto;
+    padding: 0 0 30px;
+    width: 250px;
+}
+
+.profile-icon {
+    color: #444;
+}
