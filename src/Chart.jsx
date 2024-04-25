@@ -1,4 +1,4 @@
-import { useEntriesStore } from './Store';
+import { useEntriesStore } from './store';
 import {
     Chart as ChartJS,
     CategoryScale,

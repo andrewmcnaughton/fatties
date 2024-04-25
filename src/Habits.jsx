@@ -1,4 +1,4 @@
-import { useEntriesStore } from './Store';
+import { useEntriesStore } from './store';
 import { supabase } from './lib/api';
 import {
     Popover,
@@ -13,14 +13,12 @@ export default function OtherData() {
     const entries = useEntriesStore(state => state.entries);
 
     async function handleHabitChange(id, habit, value) {
-        console.log(id, habit, value);
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from('entries')
             .update({
                 [habit]: !value,
             })
-            .eq('id', id)
-            .select();
+            .eq('id', id);
         if (error) console.log(error);
     }
 

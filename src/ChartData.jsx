@@ -1,4 +1,4 @@
-import { useEntriesStore } from './Store';
+import { useEntriesStore } from './store';
 import { useState } from 'react';
 import { supabase } from './lib/api';
 import { Button } from '@/components/ui/button';

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from './lib/api';
-import { useUsersStore } from './Store';
+import { useUsersStore } from './store';
 
 export default function Form() {
     const user = useUsersStore(state => state.user);

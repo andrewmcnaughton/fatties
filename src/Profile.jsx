@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from './lib/api';
-import { useUsersStore } from './Store';
+import { useUsersStore } from './store';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import {
@@ -15,11 +15,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CircleUserRound, LogOut, LoaderCircle } from 'lucide-react';
-import useAuth from './useAuth';
 
 export default function Profile() {
     const user = useUsersStore(state => state.user);
-    const { logout } = useAuth();
+    const logout = useUsersStore(state => state.logout);
     const [name, setName] = useState('');
     const [startWeight, setStartWeight] = useState('');
     const [goalWeight, setGoalWeight] = useState('');
