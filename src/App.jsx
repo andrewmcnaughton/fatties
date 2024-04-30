@@ -11,7 +11,7 @@ function App() {
     useAuth();
     useDB();
     const user = useUsersStore(state => state.user);
-
+    console.log('App');
     return (
         <>
             <Profile />

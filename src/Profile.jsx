@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CircleUserRound, LogOut, LoaderCircle } from 'lucide-react';
+import { TwitterPicker } from 'react-color';
 
 export default function Profile() {
     const user = useUsersStore(state => state.user);
@@ -26,6 +27,7 @@ export default function Profile() {
     const [profile, setProfile] = useState({});
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [color, setColor] = useState('');
 
     useEffect(() => {
         getProfile();
@@ -40,13 +42,20 @@ export default function Profile() {
                 .eq('id', user.id);
 
             if (data) {
-                const { name, start_weight, goal_weight, group } = data[0];
+                const { name, start_weight, goal_weight, group, color } =
+                    data[0];
                 setProfile(data[0]);
                 setName(name);
                 setStartWeight(start_weight);
                 setGoalWeight(goal_weight);
                 setGroup(group);
+                color === null
+                    ? setColor(
+                          Math.floor(Math.random() * 16777215).toString(16)
+                      )
+                    : setColor(color);
             }
+            console.log(color);
         }
     }
 
@@ -66,6 +75,10 @@ export default function Profile() {
         setGroup(event.target.value);
     }
 
+    function handleColorChange(color, event) {
+        setColor(color.hex);
+    }
+
     async function handleProfileFormSubmit(event) {
         setLoading(true);
         event.preventDefault();
@@ -76,6 +89,7 @@ export default function Profile() {
                 start_weight: startWeight,
                 goal_weight: goalWeight,
                 group: group,
+                color: color,
             })
             .eq('id', profile.id)
             .select();
@@ -156,6 +170,13 @@ export default function Profile() {
                                         value={goalWeight}
                                         onChange={handleGoalWeightChange}
                                         className="mb-4"
+                                    />
+                                    <Label htmlFor="colour">Colour</Label>
+                                    <TwitterPicker
+                                        triangle="hide"
+                                        className="mb-4"
+                                        color={color}
+                                        onChangeComplete={handleColorChange}
                                     />
                                     <Label htmlFor="groupId">Group ID</Label>
                                     <Input
