@@ -1,4 +1,4 @@
-import { useEntriesStore, useUsersStore } from './store';
+import { useStore } from './store';
 import { useState, Fragment } from 'react';
 import { supabase } from './lib/api';
 import { Button } from '@/components/ui/button';
@@ -12,9 +12,9 @@ import { Input } from '@/components/ui/input';
 import { LoaderCircle, Pencil, X } from 'lucide-react';
 
 export default function ChartData() {
-    const entries = useEntriesStore(state => state.entries);
-    const userStore = useUsersStore(state => state.user);
-    const group = useUsersStore(state => state.group);
+    const entries = useStore(state => state.entries);
+    const profile = useStore(state => state.profile);
+    const group = useStore(state => state.group);
     const [changedWeight, setChangedWeight] = useState(null);
     const [changedSteps, setChangedSteps] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -30,7 +30,7 @@ export default function ChartData() {
     async function handleChartDataFormSubmit(event, id, weight, steps) {
         setLoading(true);
         event.preventDefault();
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from('entries')
             .update({
                 weight: changedWeight ? changedWeight : weight,
@@ -63,7 +63,7 @@ export default function ChartData() {
                             >
                                 <div className="header">
                                     Day {index}
-                                    {user[0] == userStore.id && (
+                                    {user[0] == profile.id && (
                                         <Popover>
                                             <PopoverTrigger asChild>
                                                 <Pencil className="h-5 w-5 -mt-14 ml-5" />

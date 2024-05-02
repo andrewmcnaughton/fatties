@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { supabase } from './lib/api';
-import { useUsersStore } from './store';
+import { supabase, logout, getProfile, getGroup } from './lib/api';
+import { useStore } from './store';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import {
@@ -18,46 +18,36 @@ import { CircleUserRound, LogOut, LoaderCircle } from 'lucide-react';
 import { TwitterPicker } from 'react-color';
 
 export default function Profile() {
-    const user = useUsersStore(state => state.user);
-    const logout = useUsersStore(state => state.logout);
+    // Global state
+    const session = useStore(state => state.session);
+    const profile = useStore(state => state.profile);
+    const init = useStore(state => state.init);
+    const setProfile = useStore(state => state.setProfile);
+    const newGroup = useStore(state => state.setGroup);
+
+    // Local state
     const [name, setName] = useState('');
     const [startWeight, setStartWeight] = useState('');
     const [goalWeight, setGoalWeight] = useState('');
     const [group, setGroup] = useState('');
-    const [profile, setProfile] = useState({});
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [color, setColor] = useState('');
 
     useEffect(() => {
-        getProfile();
-    }, [user]);
+        loadProfile(profile);
+    }, [init, profile]);
 
-    async function getProfile() {
-        // if user is false then dont do the fetch
-        if (user) {
-            const { data } = await supabase
-                .from('users')
-                .select()
-                .eq('id', user.id);
-
-            if (data) {
-                const { name, start_weight, goal_weight, group, color } =
-                    data[0];
-                setProfile(data[0]);
-                setName(name);
-                setStartWeight(start_weight);
-                setGoalWeight(goal_weight);
-                setGroup(group);
-                color === null
-                    ? setColor(
-                          Math.floor(Math.random() * 16777215).toString(16)
-                      )
-                    : setColor(color);
-            }
-            console.log(color);
-        }
+    function loadProfile(profile) {
+        const { name, start_weight, goal_weight, group, color } = profile;
+        setName(name);
+        setStartWeight(start_weight);
+        setGoalWeight(goal_weight);
+        setGroup(group);
+        setColor(color);
     }
+
+    // console.log(profile);
 
     function handleNameChange(event) {
         setName(event.target.value);
@@ -75,7 +65,7 @@ export default function Profile() {
         setGroup(event.target.value);
     }
 
-    function handleColorChange(color, event) {
+    function handleColorChange(color) {
         setColor(color.hex);
     }
 
@@ -94,16 +84,17 @@ export default function Profile() {
             .eq('id', profile.id)
             .select();
         if (error) console.log(error);
-        setTimeout(() => {
-            setOpen(false);
-            setLoading(false);
-        }, 500);
-        console.log(data);
-    }
 
+        const promises = [getProfile(session), getGroup(session)];
+        const results = await Promise.allSettled(promises);
+        setProfile(results[0].value);
+        newGroup(results[1].value);
+        setOpen(false);
+        setLoading(false);
+    }
     return (
         <div className="profile">
-            {!user && (
+            {!session && (
                 <Auth
                     supabaseClient={supabase}
                     appearance={{
@@ -113,7 +104,7 @@ export default function Profile() {
                     onlyThirdPartyProviders
                 />
             )}
-            {user && (
+            {session && (
                 <Dialog open={open} onOpenChange={setOpen}>
                     <DialogTrigger asChild>
                         <Button variant="ghost">

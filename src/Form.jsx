@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { supabase } from './lib/api';
-import { useUsersStore } from './store';
+import { useStore } from './store';
 
 export default function Form() {
-    const user = useUsersStore(state => state.user);
+    const session = useStore(state => state.session);
     const [weight, setWeight] = useState(0);
     const [steps, setSteps] = useState(0);
     const [diet, setDiet] = useState(false);
@@ -42,7 +42,7 @@ export default function Form() {
             .from('entries')
             .insert({
                 date: date,
-                user_id: user.id,
+                user_id: session.id,
                 weight: weight,
                 steps: steps,
                 diet: diet,

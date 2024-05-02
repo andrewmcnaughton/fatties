@@ -1,4 +1,4 @@
-import { useEntriesStore, useUsersStore } from './store';
+import { useStore } from './store';
 import { supabase } from './lib/api';
 import {
     Popover,
@@ -11,8 +11,10 @@ import { Pencil } from 'lucide-react';
 import { Fragment } from 'react';
 
 export default function OtherData() {
-    const entries = useEntriesStore(state => state.entries);
-    const { user: userStore, group } = useUsersStore(state => state);
+    const entries = useStore(state => state.entries);
+    const profile = useStore(state => state.profile);
+    const group = useStore(state => state.group);
+
     async function handleHabitChange(id, habit, value) {
         const { error } = await supabase
             .from('entries')
@@ -38,7 +40,7 @@ export default function OtherData() {
                             <div key={entry.id} className="day">
                                 <div className="header">
                                     Day {index}
-                                    {user[0] == userStore.id && (
+                                    {user[0] == profile.id && (
                                         <Popover>
                                             <PopoverTrigger asChild>
                                                 <Pencil className="h-5 w-5 -mt-14 ml-5" />

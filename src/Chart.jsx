@@ -1,4 +1,5 @@
-import { useEntriesStore, useUsersStore } from './store';
+import { useEffect } from 'react';
+import { useStore } from './store';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -9,7 +10,6 @@ import {
     Tooltip,
     Legend,
 } from 'chart.js';
-import { useMemo } from 'react';
 import { Line } from 'react-chartjs-2';
 
 ChartJS.register(
@@ -31,10 +31,11 @@ function findByMatchingProperties(set, properties) {
 
 function getChartData(entries, group) {
     let datasets = [];
-    entries.map(function (user) {
+    entries.forEach(function (user) {
         let weights = [];
         let steps = [];
-        const results = findByMatchingProperties(group, { id: user[0] });
+        const filterGroup = findByMatchingProperties(group, { id: user[0] });
+
         [user[1]].forEach(rows => {
             rows.forEach(row => {
                 if (row.weight === 0) {
@@ -49,7 +50,7 @@ function getChartData(entries, group) {
                 }
             });
         });
-        let name = [];
+        let name = '';
         group.forEach(function (groupmember) {
             if (groupmember.id === user[0]) {
                 name = [...name, groupmember.name];
@@ -58,72 +59,80 @@ function getChartData(entries, group) {
         datasets = [
             ...datasets,
             {
-                label: name,
+                label: name + ' (weight)',
                 data: weights,
-                borderColor: `${results[0].color}`,
+                borderColor: `${filterGroup[0].color}`,
                 borderWidth: 2,
-                backgroundColor: `${results[0].color}`,
+                backgroundColor: `${filterGroup[0].color}`,
                 yAxisID: 'y',
             },
         ];
         datasets = [
             ...datasets,
             {
-                label: name,
+                label: name + ' (steps)',
                 data: steps,
-                borderColor: `${results[0].color}`,
-                backgroundColor: `${results[0].color}`,
+                borderColor: `${filterGroup[0].color}20`,
+                backgroundColor: `${filterGroup[0].color}30`,
                 borderWidth: 2,
                 yAxisID: 'y1',
             },
         ];
+        //const color = JSON.stringify(grouped[0].color);
     });
     return datasets;
 }
 
 export default function Chart() {
-    const entries = useEntriesStore(state => state.entries);
-    const group = useUsersStore(state => state.group);
+    const entries = useStore(state => state.entries);
+    const group = useStore(state => state.group);
+    //const profile = useStore(state => state.group);
 
     const days = [];
     for (let x = 0; x <= 30; x++) {
         days.push(`Day ${x}`);
     }
 
-    const datasets = useMemo(
-        function () {
-            return getChartData(entries, group);
-        },
-        [getChartData, entries, group]
-    );
+    const datasets = getChartData(entries, group);
 
     const chartData = {
         labels: days,
         datasets: datasets,
     };
 
-    console.log('lolz');
     return (
         <Line
             data={chartData}
             options={{
                 maintainAspectRatio: true,
-                height: '400px',
+                height: '600px',
                 cubicInterpolationMode: 'monotone',
                 spanGaps: true,
                 plugins: {
-                    legend: {
-                        labels: {
-                            filter: function (legendItem, data) {
-                                let label =
-                                    data.datasets[legendItem.datasetIndex]
-                                        .label || '';
-                                if (typeof label !== 'undefined') {
-                                    if (legendItem.datasetIndex % 2) {
-                                        return false;
-                                    }
+                    // legend: {
+                    //     labels: {
+                    //         filter: function (legendItem, data) {
+                    //             let label =
+                    //                 data.datasets[legendItem.datasetIndex]
+                    //                     .label || '';
+                    //             if (typeof label !== 'undefined') {
+                    //                 if (legendItem.datasetIndex % 2) {
+                    //                     return false;
+                    //                 }
+                    //             }
+                    //             return label;
+                    //         },
+                    //     },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                if (context.dataset.yAxisID == 'y') {
+                                    let label = ' ' + context.raw + 'kg';
+                                    return label;
+                                } else {
+                                    let label = ' ' + context.raw + ' steps';
+                                    return label;
                                 }
-                                return label;
                             },
                         },
                     },
@@ -132,13 +141,13 @@ export default function Chart() {
                     y: {
                         title: {
                             display: true,
-                            text: 'Weight (kg)  ',
+                            text: 'Weight (kg)',
                         },
                         type: 'linear',
                         display: true,
                         position: 'left',
-                        suggestedMin: 82,
-                        suggestedMax: 105,
+                        suggestedMin: 70,
+                        suggestedMax: 125,
                     },
                     y1: {
                         title: {
